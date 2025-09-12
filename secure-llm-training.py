@@ -449,37 +449,133 @@ def setup_monitoring_and_logging():
     print("✅ Monitoring and logging setup complete!")
 
 def cleanup_resources():
-    """Provide cleanup commands after training completes."""
+    """Provide cleanup commands after training completes. Generates Windows .bat file."""
     print("\n" + "="*60)
-    print("🧹 CLEANUP INSTRUCTIONS")
+    print("🧹 CLEANUP INSTRUCTIONS - WINDOWS COMPATIBLE")
     print("="*60)
 
-    cleanup_commands = f"""
-# ⚠️ IMPORTANT: Run these commands after training to clean up resources:
+    # Generate Windows batch file format
+    batch_commands = f"""@echo off
+REM === LLM TRAINING CLEANUP - WINDOWS BATCH FILE ===
+REM This script automatically cleans up all GCP resources created by secure-llm-training.py
+REM Generated on: {GCP_REGION} for project: {GCP_PROJECT}
+REM WARNING: This will delete ALL data without confirmation!
 
-# Stop and delete compute instance
-gcloud compute instances stop {SECURITY_CONFIG['compute']['instance_prefix']}-001 --zone {GCP_ZONE}
-gcloud compute instances delete {SECURITY_CONFIG['compute']['instance_prefix']}-001 --zone {GCP_ZONE}
+echo.
+echo ===========================================
+echo 🧹 LLM TRAINING CLEANUP SCRIPT
+echo ===========================================
+echo.
+echo ⚠️  WARNING: This will DELETE ALL DATA!
+echo.
+echo This batch file will clean up the following:
+echo 📍 Compute Instance: llm-trainer-001 ({GCP_ZONE})
+echo 📦 Storage Buckets: gs://{SECURITY_CONFIG['storage']['model_bucket']}, gs://{SECURITY_CONFIG['storage']['dataset_bucket']}
+echo 🔐 KMS Keys: llm-training-keys
+echo 🌐 Network Resources: llm-training-vpc and subnets
+echo.
+echo Press Ctrl+C NOW if you want to cancel!
+echo.
+timeout /t 10 /nobreak >nul
+echo.
+echo ✅ Proceeding with cleanup...
+echo.
 
-# Delete storage buckets (CAUTION: This will delete ALL data)
-gsutil rb -r gs://{SECURITY_CONFIG['storage']['model_bucket']}
-gsutil rb -r gs://{SECURITY_CONFIG['storage']['dataset_bucket']}
+REM Stop and delete compute instance
+echo 🔧 Stopping and deleting compute instance...
+gcloud compute instances stop {SECURITY_CONFIG['compute']['instance_prefix']}-001 --zone {GCP_ZONE} --quiet 2>nul
+if %errorlevel%==0 (
+    echo ✅ Instance stopped successfully
+) else (
+    echo ⚠️ Instance already stopped or not found
+)
 
-# Delete encryption keys
-gcloud kms keys destroy {SECURITY_CONFIG['security']['kms_key']} \
---keyring {SECURITY_CONFIG['security']['kms_key_ring']} --location {GCP_REGION}
+gcloud compute instances delete {SECURITY_CONFIG['compute']['instance_prefix']}-001 --zone {GCP_ZONE} --quiet 2>nul
+if %errorlevel%==0 (
+    echo ✅ Compute instance deleted
+) else (
+    echo ❌ Compute instance deletion failed
+)
+echo.
 
-# Delete VPC and all subnets/firewall rules
-gcloud compute networks subnets delete {SECURITY_CONFIG['vpc']['subnet']} --region {GCP_REGION}
-gcloud compute networks delete {SECURITY_CONFIG['vpc']['name']}
+REM Delete storage buckets (CAUTION: This will delete ALL data)
+echo 🔧 Deleting storage buckets (ALL DATA WILL BE LOST)...
+echo ⚠️  WARNING: Deleting gs://{SECURITY_CONFIG['storage']['model_bucket']}
+
+gcloud storage rm -r gs://{SECURITY_CONFIG['storage']['model_bucket']} 2>nul
+if %errorlevel%==0 (
+    echo ✅ Model bucket deleted
+) else (
+    echo ❌ Model bucket deletion failed or not found
+)
+
+echo ⚠️  WARNING: Deleting gs://{SECURITY_CONFIG['storage']['dataset_bucket']}
+gcloud storage rm -r gs://{SECURITY_CONFIG['storage']['dataset_bucket']} 2>nul
+if %errorlevel%==0 (
+    echo ✅ Dataset bucket deleted
+) else (
+    echo ❌ Dataset bucket deletion failed or not found
+)
+echo.
+
+REM Delete encryption keys
+echo 🔧 Deleting KMS encryption keys...
+gcloud kms keys destroy {SECURITY_CONFIG['security']['kms_key']} --keyring {SECURITY_CONFIG['security']['kms_key_ring']} --location {GCP_REGION} --quiet 2>nul
+if %errorlevel%==0 (
+    echo ✅ KMS key destroyed
+) else (
+    echo ❌ KMS key destruction failed or not found
+)
+echo.
+
+REM Delete VPC and subnets (LAST, as other resources depend on network)
+echo 🔧 Deleting network resources ({GCP_REGION})...
+echo firewall rules and subnets first...
+gcloud compute firewall-rules delete allow-ssh-internal --quiet 2>nul
+gcloud compute firewall-rules delete allow-iap-ssh --quiet 2>nul
+gcloud compute firewall-rules delete default-deny-all-{SECURITY_CONFIG['vpc']['name']} --quiet 2>nul
+
+gcloud compute networks subnets delete {SECURITY_CONFIG['vpc']['subnet']} --region {GCP_REGION} --quiet 2>nul
+if %errorlevel%==0 (
+    echo ✅ Subnet deleted
+) else (
+    echo ❌ Subnet deletion failed or not found
+)
+
+gcloud compute networks delete {SECURITY_CONFIG['vpc']['name']} --quiet 2>nul
+if %errorlevel%==0 (
+    echo ✅ VPC deleted
+) else (
+    echo ❌ VPC deletion failed or not found
+)
+
+REM Clean up test resources too
+gcloud compute networks delete {SECURITY_CONFIG['vpc']['name']}-test --quiet 2>nul
+if %errorlevel%==0 (
+    echo ✅ Test VPC cleaned up
+) else (
+    echo ❌ Test VPC already deleted or not found
+)
+echo.
+
+echo ===========================================
+echo 🎉 CLEANUP COMPLETE
+echo ===========================================
+pause
 """
 
-    print(cleanup_commands)
+    print("Windows Batch Cleanup Commands:")
+    print("===================================")
+    print(batch_commands)
 
-    # Save cleanup script
-    with open("cleanup-llm-training.sh", "w", encoding="utf-8") as f:
-        f.write(cleanup_commands)
-    print("💾 Cleanup commands saved to: cleanup-llm-training.sh")
+    # Save as Windows batch file
+    with open("cleanup-llm-training.bat", "w", encoding="utf-8") as f:
+        f.write(batch_commands)
+
+    print("💾 Windows Batch file generated: cleanup-llm-training.bat")
+    print("\nTo run cleanup:")
+    print(r".\cleanup-llm-training.bat")  # Raw string for Windows path
+    print("\n⚠️  This will delete ALL resources created by the pipeline!")
 
 # ========================================
 # MAIN EXECUTION
