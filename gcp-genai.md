@@ -1,6 +1,8 @@
 # Securing LLM/GenAI Training Pipelines on Google Cloud
 
-This guide provides a step-by-step walkthrough for implementing robust security controls for Generative AI (GenAI) and Large Language Model (LLM) **training pipelines** running on Google Cloud. The instructions include actionable steps and sample code to protect your data, infrastructure, and models during the training lifecycle.
+This guide provides a step-by-step walkthrough for implementing robust security controls for Generative AI (GenAI) and Large Language Model (LLM) **training pipelines** running on Google Cloud.
+
+> **Reference:** For detailed instructions on how to find or create all required placeholder values, see [placeholder.md](https://github.com/kenhuangus/usf/blob/main/placeholder.md).
 
 ## Table of Contents
 1.  [Prerequisites](#prerequisites)
@@ -37,7 +39,11 @@ Before running these commands, you must have the Google Cloud SDK installed and 
 ---
 
 ## Placeholders to Replace
+
 Replace the following placeholder variables in the commands below with your own environment's values.
+
+> **How do I get these values?**  
+> See [placeholder.md](https://github.com/kenhuangus/usf/blob/main/placeholder.md) for step-by-step instructions and sample commands.
 
 | Placeholder | Description | Example |
 |---|---|---|
@@ -275,4 +281,4 @@ custom_job.run(sync=True)
 
 ---
 
-**By following these steps, you can ensure your LLM/GenAI training pipeline on Google Cloud is secured against unauthorized access, data exfiltration, and other threats.
+**By following these steps, you can ensure your LLM/GenAI training pipeline on Google Cloud is secured against unauthorized access, data exfiltration, and other threats.**
