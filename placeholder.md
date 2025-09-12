@@ -1,154 +1,80 @@
 # How to Get or Create Placeholder Values for Google Cloud Security
 
-Below are detailed steps and sample gcloud CLI commands to help you find or create each required value.
+## Using a Personal Google Account (No Organization ID)
+
+If you are using a personal Google Cloud account and do **not** have an Organization ID, you can still complete most security setup steps for your project. Some steps and placeholders (like `ORGANIZATION_ID` or `ACCESS_POLICY_ID`) are only relevant for users in an organization.
+
+### What You Need
+
+For most commands, you only need:
+
+| Placeholder                | Description                              | Example                 |
+|----------------------------|------------------------------------------|-------------------------|
+| `PROJECT_ID`               | Your Google Cloud project ID             | `my-genai-project`      |
+| `PROJECT_NUMBER`           | Your Google Cloud project number         | `987654321098`          |
+| `your-genai-data-bucket`   | Unique Cloud Storage bucket name         | `genai-pipeline-data-23`|
+| `YOUR_TRUSTED_IP_RANGE`    | Trusted IP ranges for network rules      | `203.0.113.0/24`        |
+
+### How to Get Project ID and Project Number
+
+```bash
+# List all your projects
+gcloud projects list
+
+# Set your project for future commands
+gcloud config set project YOUR_PROJECT_ID
+
+# Show your project number
+gcloud projects describe YOUR_PROJECT_ID --format="value(projectNumber)"
+```
+
+### What to Do When a Command Asks for ORGANIZATION_ID or ACCESS_POLICY_ID
+
+- **Skip or modify steps that require these values.**
+- For VPC Service Controls or organizational policies, you will not be able to apply these controls as a personal account. You can skip perimeter-related steps.
+- Most IAM, bucket, and KMS commands will work as shown.
+
+### Example: Skipping Perimeter Creation
+
+If you see a command like:
+```bash
+gcloud access-context-manager perimeters create llm-training-perimeter \
+  --title="LLM Training Perimeter" \
+  --policy=ACCESS_POLICY_ID \
+  --resources=projects/PROJECT_NUMBER \
+  --restricted-services="vertex.googleapis.com,storage.googleapis.com"
+```
+**You can skip this step for personal accounts.**
+
+### The Rest of the Guide
+
+Continue to follow the guide using your project-specific values. Most security practices (IAM, buckets, KMS, audit logging) apply to personal accounts.
 
 ---
 
-## 1. ORGANIZATION_ID
+## Using an Organizational Account
 
-Your Google Cloud Organization ID is a unique numeric identifier for your organization's resources.
+If you are in a Google Cloud Organization (usually business, education, or enterprise), you will need additional values:
 
-**Get your Organization ID:**
+| Placeholder         | Description                                | Example          |
+|---------------------|--------------------------------------------|------------------|
+| `ORGANIZATION_ID`   | Your numeric Organization ID               | `123456789012`   |
+| `ACCESS_POLICY_ID`  | ID for your organization's Access Policy   | `123456789`      |
+
+### How to Get ORGANIZATION_ID
+
 ```bash
 gcloud organizations list
 ```
-Look for the `ID` column in the output.
 
----
+### How to Get ACCESS_POLICY_ID
 
-## 2. ACCESS_POLICY_ID
-
-Access Policy ID is needed for VPC Service Controls and is tied to your organization.
-
-### Prerequisite
-
-- You must have the **Organization Administrator** or **Access Context Manager Admin** role for your Google Cloud organization.
-
-### Steps to Create an Access Policy
-
-1. **Create an Access Policy for your Organization**  
-   Replace `ORGANIZATION_ID` with your actual organization ID from step 1.
-
-   ```bash
-gcloud access-context-manager policies create --organization=ORGANIZATION_ID --title="My Org Access Policy"
-```
-
-   - The `--title` can be changed to any descriptive name for your policy.
-   - On success, you'll see output similar to:
-     ```
-     name: organizations/123456789012/accessPolicies/123456789
-     title: My Org Access Policy
-     ...
-     ```
-   - The numeric part after `accessPolicies/` is your **ACCESS_POLICY_ID**.
-
-2. **List Access Policies (to verify or retrieve the ID):**
-   ```bash
+```bash
 gcloud access-context-manager policies list --organization=ORGANIZATION_ID
 ```
-   - Look for the `name` field in the output, which will look like `accessPolicies/123456789`.
 
-**Tips:**
-- You only need one access policy per organization.
-- If you already have an access policy, use the `list` command above to get its ID.
+Fill in these values for steps involving VPC perimeters, access policies, and org-level controls.
 
 ---
 
-## 3. PROJECT_ID and PROJECT_NUMBER
-
-- `PROJECT_ID` is a unique string identifier for your Google Cloud project.
-- `PROJECT_NUMBER` is a unique numeric identifier for your project.
-
-**Create a new project:**
-```bash
-gcloud projects create my-genai-project --name="My GenAI Project"
-```
-
-**Get the values:**
-```bash
-gcloud projects describe my-genai-project
-```
-Look for `projectId` and `projectNumber` in the output.
-
----
-
-## 4. your-genai-data-bucket
-
-A globally unique name for your Cloud Storage bucket.
-
-**Create a bucket:**
-```bash
-gsutil mb -l us-central1 gs://genai-pipeline-data-2023
-```
-Replace `genai-pipeline-data-2023` with your unique name (must be globally unique).
-
----
-
-## 5. YOUR_TRUSTED_IP_RANGE
-
-The IP range you trust (for example, your office network).
-
-**Find your IP address:**
-- Visit [https://whatismyipaddress.com/](https://whatismyipaddress.com/) for your current public IP address.
-- For a range, consult your network admin or use a CIDR calculator.
-
-**Example single IP:**
-`203.0.113.1/32`
-
-**Example range:**
-`203.0.113.0/24`
-
----
-
-## 6. SERVICE_ACCOUNT_EMAIL
-
-The email address of a service account you create for your pipeline.
-
-**Create a service account:**
-```bash
-gcloud iam service-accounts create genai-pipeline-sa --display-name="GenAI Pipeline Service Account"
-```
-
-**Get the email:**
-```bash
-gcloud iam service-accounts list
-```
-Look for `genai-pipeline-sa@YOUR_PROJECT_ID.iam.gserviceaccount.com` in the output.
-
----
-
-## 7. KMS Key Ring and Key
-
-**Create a Key Ring:**
-```bash
-gcloud kms keyrings create genai-keyring --location=us-central1
-```
-
-**Create a Key:**
-```bash
-gcloud kms keys create genai-data-key \
-  --keyring=genai-keyring \
-  --location=us-central1 \
-  --purpose=encryption
-```
-
----
-
-## 8. Viewing All Placeholders and Their Values
-
-After following the above steps, you can list your resources for reference:
-- Organizations: `gcloud organizations list`
-- Projects: `gcloud projects list`
-- Buckets: `gsutil ls`
-- Service Accounts: `gcloud iam service-accounts list`
-- KMS Key Rings and Keys:
-  ```bash
-  gcloud kms keyrings list --location=us-central1
-  gcloud kms keys list --keyring=genai-keyring --location=us-central1
-  ```
-
----
-
-If you get stuck, Google Cloud documentation has tutorials for [projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects), [service accounts](https://cloud.google.com/iam/docs/creating-managing-service-accounts), and [KMS keys](https://cloud.google.com/kms/docs/creating-keys).
-
-Now you have all the information you need to fill in the placeholders in the rest of the guide!
+**If you have questions about either setup, open an issue or discussion on the repository!**
