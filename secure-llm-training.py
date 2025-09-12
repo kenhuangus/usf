@@ -378,7 +378,7 @@ gcloud compute networks delete {SECURITY_CONFIG['vpc']['name']}
     print(cleanup_commands)
 
     # Save cleanup script
-    with open("cleanup-llm-training.sh", "w") as f:
+    with open("cleanup-llm-training.sh", "w", encoding="utf-8") as f:
         f.write(cleanup_commands)
     print("💾 Cleanup commands saved to: cleanup-llm-training.sh")
 
