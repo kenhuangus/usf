@@ -46,6 +46,17 @@ gcloud access-context-manager perimeters create llm-training-perimeter \
 ```
 **You can skip this step for personal accounts.**
 
+### Example: Creating VPC and Firewall Setup for Personal Accounts
+
+For firewalls and network rules, personal accounts can create custom VPCs:
+
+```bash
+# Create a VPC network
+gcloud compute networks create genai-vpc --subnet-mode=custom
+
+# Then create firewall rules as shown in the guide
+```
+
 ### The Rest of the Guide
 
 Continue to follow the guide using your project-specific values. Most security practices (IAM, buckets, KMS, audit logging) apply to personal accounts.

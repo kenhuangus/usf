@@ -45,14 +45,16 @@ Replace the following placeholder variables in the commands below with your own 
 > **How do I get these values?**  
 > See [placeholder.md](https://github.com/kenhuangus/usf/blob/main/placeholder.md) for step-by-step instructions and sample commands.
 
+> **Note for Personal Accounts:** If you are using a personal Google Cloud account without an Organization ID, you can skip placeholders `ORGANIZATION_ID` and `ACCESS_POLICY_ID`, and related steps that require them. Most security features still apply at the project level.
+
 | Placeholder | Description | Example |
 |---|---|---|
-| `ORGANIZATION_ID` | Your numeric Google Cloud Organization ID. | `123456789012` |
-| `ACCESS_POLICY_ID` | The numeric ID of your organization's Access Policy. | `123456789` |
+| `ORGANIZATION_ID`| Your numeric Google Cloud Organization ID (not needed for personal accounts). | `123456789012` |
+| `ACCESS_POLICY_ID`| The numeric ID of your organization's Access Policy (not needed for personal accounts). | `123456789` |
 | `PROJECT_ID` | Your alphanumeric Project ID. | `my-genai-project` |
 | `PROJECT_NUMBER` | Your numeric Project Number. | `987654321098` |
 | `your-genai-data-bucket`| A globally unique name for a Cloud Storage bucket. | `genai-pipeline-data-2023`|
-| `YOUR_TRUSTED_IP_RANGE`| The IP range for administrative access. | `203.0.113.0/24` |
+| `YOUR_TRUSTED_IP_RANGE`| The IP range for administrative access (optional for personal accounts). | `203.0.113.0/24` |
 
 ---
 
@@ -60,6 +62,8 @@ Replace the following placeholder variables in the commands below with your own 
 
 **Isolate training environments:**  
 Use VPC Service Controls to restrict network access and prevent data exfiltration.
+
+> **Note for Personal Accounts:** This step requires an Organization ID and Access Policy, which are not available for personal Google Cloud accounts. Skip this step if using a personal account. You can still implement other security measures at the project level.
 
 ```bash
 gcloud access-context-manager perimeters create llm-training-perimeter \
@@ -115,6 +119,10 @@ gcloud storage buckets add-iam-policy-binding gs://your-genai-data-bucket \
 ## Step 3: Configure Firewalls
 
 **Allow only internal communication for training nodes:**
+
+> **Note for Personal Accounts:** Before creating firewall rules, ensure you have a VPC network. If it doesn't exist, create it with:  
+> `gcloud compute networks create genai-vpc --subnet-mode=custom`  
+> You can optionally create subnets if needed.
 
 ```bash
 gcloud compute firewall-rules create allow-training-internal \
