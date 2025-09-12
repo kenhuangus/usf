@@ -172,6 +172,141 @@ if %errorlevel%==0 (
 )
 echo.
 
+REM RESOURCE INVENTORY STEP
+echo 🔍 RESOURCE INVENTORY - CHECKING EXISTING RESOURCES
+echo ========================================================
+echo 📋 Scanning for LLM Training resources that need cleanup...
+
+set VPC_FOUND=false
+set FIREWALL_FOUND=false
+set KMS_FOUND=false
+set BUCKET_COUNT=0
+
+REM Check VPC networks
+echo.
+echo 🔍 Checking VPC networks...
+gcloud compute networks list --format="value(name)" 2>nul | findstr "llm-training" 2>nul > temp_vpc.txt
+if %errorlevel%==0 (
+    for /f %%a in (temp_vpc.txt) do (
+        echo ⚠️  FOUND: VPC Network - %%a
+        set VPC_FOUND=true
+    )
+) else (
+    echo ✅ No LLM Training VPCs found
+)
+
+REM Check firewall rules
+echo.
+echo 🔍 Checking firewall rules...
+gcloud compute firewall-rules list --format="value(name)" 2>nul | findstr "llm-training" 2>nul > temp_firewall.txt
+if %errorlevel%==0 (
+    for /f %%a in (temp_firewall.txt) do (
+        echo ⚠️  FOUND: Firewall Rule - %%a
+        set FIREWALL_FOUND=true
+    )
+) else (
+    echo ✅ No LLM Training firewall rules found
+)
+
+REM Check KMS keyrings
+echo.
+echo 🔍 Checking KMS keyrings...
+gcloud kms keyrings list --location=us-east1 --format="value(name)" 2>nul | findstr "llm-training-keys" 2>nul > temp_kms.txt
+if %errorlevel%==0 (
+    for /f %%a in (temp_kms.txt) do (
+        echo ⚠️  FOUND: KMS Keyring - %%a
+        set KMS_FOUND=true
+
+        REM Check keys in this keyring
+        echo      └─ Checking keys within keyring...
+        gcloud kms keys list --keyring llm-training-keys --location=us-east1 --format="value(name)" 2>nul > temp_keys.txt
+        if %errorlevel%==0 (
+            for /f %%k in (temp_keys.txt) do (
+                echo      ├─ COMMAND Key: %%k
+            )
+        )
+    )
+) else (
+    echo ✅ No LLM Training keyrings found
+)
+
+REM Check storage buckets
+echo.
+echo 🔍 Checking storage buckets...
+gcloud storage buckets list --format="value(name)" 2>nul | findstr "agentic-fortress-" 2>nul | findstr "llm\|training" 2>nul > temp_buckets.txt
+if %errorlevel%==0 (
+    for /f %%a in (temp_buckets.txt) do (
+        echo ⚠️  FOUND: Storage Bucket - gs://%%a
+        set /a BUCKET_COUNT+=1
+    )
+) else (
+    echo ✅ No LLM Training storage buckets found
+)
+
+REM Check compute instances
+echo.
+echo 🔍 Checking compute instances...
+gcloud compute instances list --format="value(name,zone)" 2>nul | findstr "llm-trainer" 2>nul > temp_instances.txt
+if %errorlevel%==0 (
+    echo ⚠️  FOUND: Compute Instance(s) -
+    type temp_instances.txt
+    set INSTANCE_FOUND=true
+) else (
+    echo ✅ No LLM Training compute instances found
+)
+
+REM Clean up temp files
+if exist temp_*.txt (
+    del temp_*.txt 2>nul
+)
+
+echo.
+echo ========================================================
+echo 📊 RESOURCE INVENTORY SUMMARY
+echo ========================================================
+
+if defined VPC_FOUND (
+    echo 🔶 VPC Networks: At least 1 found - WILL BE CLEANED
+) else (
+    echo ✅ VPC Networks: None found - CLEAN
+)
+
+if defined FIREWALL_FOUND (
+    echo 🔶 Firewall Rules: At least 1 found - WILL BE CLEANED
+) else (
+    echo ✅ Firewall Rules: None found - CLEAN
+)
+
+if defined KMS_FOUND (
+    echo 🔶 KMS Keyrings/Keys: At least 1 found - WILL BE CLEANED
+) else (
+    echo ✅ KMS Keyrings/Keys: None found - CLEAN
+)
+
+echo 👁️  Storage Buckets: %BUCKET_COUNT% found - WILL BE CLEANED
+echo 📍 Compute Instances: Checked and status shown above
+
+echo.
+echo 💡 NOTE: Resources shown above will be permanently deleted!
+if %BUCKET_COUNT% gtr 0 (
+    echo ⚠️  STORAGE BUCKETS CONTAIN DATA THAT WILL BE LOST!
+)
+echo.
+
+set /p confirm="Do you want to proceed with this cleanup? (type YES): "
+if /i not "%confirm%"=="YES" (
+    echo.
+    echo ❌ CLEANUP CANCELLED: No resources were deleted.
+    goto :end
+)
+
+echo.
+echo ✅ CLEANUP AUTHORIZED - Starting systematic cleanup...
+echo.
+echo ========================================================
+echo 🧹 SYSTEMATIC CLEANUP PROCESS
+echo ========================================================
+
 REM VERIFICATION STEP
 echo 🔍 CLEANUP VERIFICATION
 echo ========================================================
