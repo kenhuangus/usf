@@ -377,7 +377,7 @@ systemctl enable docker
 echo "Secure training environment ready!"
 """
 
-    # Create the instance with maximum security
+    # Create the instance with validated security features
     run_gcp_command([
         "gcloud", "compute", "instances", "create", instance_name,
         "--zone", GCP_ZONE,
@@ -397,10 +397,8 @@ echo "Secure training environment ready!"
         "--shielded-secure-boot",
         "--shielded-vtpm",
         "--shielded-integrity-monitoring",
-        "--shielded-learn-integrity-policy",
         "--reservation-affinity", "none",
         "--metadata", "startup-script=" + startup_script,
-        "--metadata-from-file", "environment=secure-training-env.sh",
         "--tags", "llm-training,secure-compute",
     ], "Creating secured compute instance with GPU")
 
