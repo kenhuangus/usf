@@ -413,7 +413,23 @@ def main():
         print("🚀 Starting complete security setup for LLM training...")
 
         try:
-            # Execute security setup steps
+            print("\n🎯 CREATING BASIC SecURE STORAGE BUCKET FIRST...")
+            # Start with just a storage bucket to prove resource creation works
+            print("This will create a bucket and prove billing/charging works!")
+
+            # Quick test - create just the bucket
+            run_gcp_command([
+                "gsutil", "mb",
+                "-p", GCP_PROJECT,
+                "-c", "STANDARD",
+                f"gs://{SECURITY_CONFIG['storage']['model_bucket']}",
+            ], "TEST: Creating model storage bucket - this proves resources are created!")
+
+            print("✅ TEST SUCCESSFUL: Bucket created! Charges apply to personal billing account.")
+            print(f"📦 Created: gs://{SECURITY_CONFIG['storage']['model_bucket']}")
+
+            # Now create full secure environment
+            print("\n🚀 NOW CREATING FULL SECURITY SETUP...")
             create_secure_vpc()
             setup_encryption_keys()
             create_secure_storage_buckets()
