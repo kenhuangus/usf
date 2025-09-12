@@ -20,11 +20,37 @@ Look for the `ID` column in the output.
 
 Access Policy ID is needed for VPC Service Controls and is tied to your organization.
 
-**Get your Access Policy ID:**
-```bash
+### Prerequisite
+
+- You must have the **Organization Administrator** or **Access Context Manager Admin** role for your Google Cloud organization.
+
+### Steps to Create an Access Policy
+
+1. **Create an Access Policy for your Organization**  
+   Replace `ORGANIZATION_ID` with your actual organization ID from step 1.
+
+   ```bash
+gcloud access-context-manager policies create --organization=ORGANIZATION_ID --title="My Org Access Policy"
+```
+
+   - The `--title` can be changed to any descriptive name for your policy.
+   - On success, you'll see output similar to:
+     ```
+     name: organizations/123456789012/accessPolicies/123456789
+     title: My Org Access Policy
+     ...
+     ```
+   - The numeric part after `accessPolicies/` is your **ACCESS_POLICY_ID**.
+
+2. **List Access Policies (to verify or retrieve the ID):**
+   ```bash
 gcloud access-context-manager policies list --organization=ORGANIZATION_ID
 ```
-The output will show the `name` field, which is your Access Policy ID.
+   - Look for the `name` field in the output, which will look like `accessPolicies/123456789`.
+
+**Tips:**
+- You only need one access policy per organization.
+- If you already have an access policy, use the `list` command above to get its ID.
 
 ---
 
