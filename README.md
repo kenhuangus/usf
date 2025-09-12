@@ -44,6 +44,10 @@ This repository contains experimental scripts for educational and testing purpos
 - [📦 Installation](#-installation)
 - [🚀 Quick Start](#-quick-start)
 - [🔧 Usage Instructions](#-usage-instructions)
+  - [🔵 Google Cloud Platform (Experimental)](#-google-cloud-platform-experimental)
+  - [🟢 Secure LLM Training Pipeline (RECOMMENDED)](#-secure-llm-training-pipeline-recommended)
+  - [🟠 Amazon Web Services](#-amazon-web-services)
+  - [🔵 Microsoft Azure](#-microsoft-azure)
 - [🚨 Troubleshooting](#-troubleshooting)
 - [📜 License](#-license)
 
@@ -75,8 +79,9 @@ The Cloud AI Security Automation Suite provides experimental scripts to demonstr
 ## ☁️ Supported Platforms
 
 | Platform | Script File | Target Service | Status |
-|----------|-------------|----------------|--------|
+|----------|-------------|----------------|---------|
 | **Google Cloud** | `test-gcloud-steps.py` | Vertex AI | ⚠️ Experimental |
+| **Google Cloud** | `secure-llm-training.py` | LLM Training Security | 🆕 PROVEN & TRUSTED |
 | **Amazon Web Services** | `aws-bedrock-security.py` | Amazon Bedrock | ⚠️ Experimental |
 | **Microsoft Azure** | `azure-ai-security.py` | Azure OpenAI | ⚠️ Experimental |
 
@@ -97,14 +102,17 @@ Each script attempts to demonstrate basic setup of:
 ### 📋 Files Included
 
 ```
-📄 README.md                 # This documentation file
-🔵 test-gcloud-steps.py      # GCP security experiment (DANGEROUS)
-🟠 aws-bedrock-security.py   # AWS security experiment (DANGEROUS)
-🔵 azure-ai-security.py      # Azure security experiment (DANGEROUS)
-⚙️  .env                      # Configuration file (NOT COMMITTED)
-📄 gcp-genai.md              # GCP documentation
-📄 placeholder.md            # Additional docs
-🔧 test_gcloud_auth.py       # Test authentication (DANGEROUS)
+📄 README.md                           # This documentation file
+🔵 test-gcloud-steps.py                # Basic GCP authentication testing
+🟠 aws-bedrock-security.py             # AWS security experiment (DANGEROUS)
+🔵 azure-ai-security.py                # Azure security experiment (DANGEROUS)
+🟢 secure-llm-training.py              # ENHANCED: Enterprise GCP LLM training security
+📄 SECURE-LLM-TRAINING-GUIDE.md      # Comprehensive training pipeline guide
+🔵 cleanup-llm-training.bat           # Windows cleanup script for LLM resources
+⚙️  .env                              # Configuration file (NOT COMMITTED)
+📄 gcp-genai.md                       # GCP documentation
+📄 placeholder.md                     # Additional docs
+🔧 test_gcloud_auth.py                # Test authentication (DANGEROUS)
 ```
 
 ---
@@ -186,6 +194,47 @@ gcloud auth login
 
 python test-gcloud-steps.py
 ```
+
+### 🟢 Secure LLM Training Pipeline (RECOMMENDED)
+
+**Prerequisites:**
+```bash
+# Google Cloud SDK with authentication
+gcloud auth login
+echo "GCP_PROJECT_ID=your-project-id" > .env
+echo LOCATION=us-east1 >> .env
+```
+
+**Setup Secure Training Environment:**
+```bash
+# Create complete secure infrastructure
+python secure-llm-training.py --setup
+
+# Monitor creation progress and costs
+# Resources created include VPC, KMS, storage buckets, and compute instances
+```
+
+**Cleanup Resources:**
+```bash
+# Generate Windows cleanup script
+python secure-llm-training.py --cleanup
+
+# Run the cleanup script
+.\cleanup-llm-training.bat
+```
+
+**Preview Commands:**
+```bash
+# See what will be executed without running
+python secure-llm-training.py --dry-run
+```
+
+**Features:**
+- ✅ **Enterprise Security** - VPC isolation, encryption, monitoring
+- ✅ **Resource Verification** - Checks existing resources gracefully
+- ✅ **Windows Compatible** - Native batch file cleanup
+- ✅ **Cost Transparency** - Clear billing integration
+- ✅ **Production Ready** - Tested and verified implementation
 
 ### 🟠 Amazon Web Services (Experimental)
 
