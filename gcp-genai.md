@@ -17,7 +17,7 @@ This guide provides a step-by-step walkthrough for implementing robust security 
 Before running these commands, you must have the Google Cloud SDK installed and configured on your local machine.
 
 ### For Windows Users:
-1.  **Install SDK:** Download and run the installer from the [Google Cloud SDK for Windows documentation](https://cloud.google.com/sdk/docs/install-windows).
+1.  **Install SDK:** Download and run the installer from the [Google Cloud SDK for Windows documentation](https://cloud.google.com/sdk/docs/install).
 2.  **Initialize SDK:** Open a Command Prompt or PowerShell and run `gcloud init`. This will guide you through authentication and project setup.
 3.  **Set Project:** Ensure you are targeting the correct project by running:
     ```bash
