@@ -339,13 +339,6 @@ SECURITY_CONFIG = {
 💰 MONTHLY ESTIMATE: ~$10 - $15
 ```
 
-### 💳 **Billing Details:**
-```bash
-# Billing starts immediately upon resource creation
-# Personal account: math.help888@gmail.com (from test results)
-# Billing method: Credit card or GCP billing account
-# Free tier: Partially applied (compute charges for GPU instances)
-
 # Cost optimization tips:
 # 1. Stop instances when not training
 # 2. Delete unused storage buckets
