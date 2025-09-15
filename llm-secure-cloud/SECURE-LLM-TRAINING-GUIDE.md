@@ -1,4 +1,4 @@
-# 🔒 Secure LLM Training Pipeline - Comprehensive Guide
+# 🔒 Secure LLM Training Pipeline 
 
 [![GCP](https://img.shields.io/badge/Google_Cloud_Platform-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white)](https://cloud.google.com/)
 [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
@@ -27,7 +27,7 @@
 
 ## 🎯 Overview & Purpose
 
-The **Secure LLM Training Pipeline** is an enterprise-grade Python script that automates the creation of a complete security-focused infrastructure for training large language models on Google Cloud Platform (GCP).
+The **Secure LLM Training Pipeline** is the Python script that automates the creation of a complete security-focused infrastructure for training large language models on Google Cloud Platform (GCP).
 
 ### 🎯 **Primary Objectives:**
 - ✅ **Secure Resource Creation** - Build secure VPC infrastructure
