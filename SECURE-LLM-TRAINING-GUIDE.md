@@ -378,7 +378,8 @@ Cloud Audit Logs      | Variable    | ~$1.00
 # Script automatically generates cleanup commands
 python secure-llm-training.py --cleanup
 
-# Creates: cleanup-llm-training.sh
+# Creates: cleanup-llm-training.bat (Windows-compatible)
+# Includes resource inventory checking and requires explicit confirmation
 ```
 
 ### 🔧 **Manual Cleanup Steps:**

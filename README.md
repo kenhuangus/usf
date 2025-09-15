@@ -110,9 +110,7 @@ Each script attempts to demonstrate basic setup of:
 📄 SECURE-LLM-TRAINING-GUIDE.md      # Comprehensive training pipeline guide
 🔵 cleanup-llm-training.bat           # Windows cleanup script for LLM resources
 ⚙️  .env                              # Configuration file (NOT COMMITTED)
-📄 gcp-genai.md                       # GCP documentation
-📄 placeholder.md                     # Additional docs
-🔧 test_gcloud_auth.py                # Test authentication (DANGEROUS)
+ test_gcloud_auth.py                # Test authentication (DANGEROUS)
 ```
 
 ---
